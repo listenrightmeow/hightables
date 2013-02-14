@@ -1,0 +1,51 @@
+<html>
+<head>
+	<title>Hightable example</title>
+</head>
+<body>
+	<table id="report_table">
+	    <thead>
+	        <tr>
+	            <th>Date</th>
+	            <th>Views : {number_format($count['view'], 0, '', ',')}</th>
+	            <th>Activations : {number_format($count['use'], 0, '', ',')}</th>
+	            <th>Launches : {number_format($count['launches'], 0, '', ',')}</th>
+	            <th>iPhone <br />Downloads : {number_format($count['iphone'], 0, '', ',')}</th>
+	            <th>Android <br />Downloads : {number_format($count['android'], 0, '', ',')}</th>
+	            <th>Downloads : {number_format($count['downloads'], 0, '', ',')}</th>
+	        </tr>
+	    </thead>
+	    <tbody>
+	        {foreach from=$days_array item=item key=key}
+	        {assign "views" ($item['track_type']['view'] > 0) ? $item['track_type']['view'] : 0 }
+	        {assign "uses" ($item['track_type']['use'] > 0) ? $item['track_type']['use'] : 0 }
+	        {assign "launches" ($item['launches'] > 0) ? $item['launches'] : 0 }
+	        {assign "iphone" ($item['downloads']['iPhone'] > 0) ? $item['downloads']['iPhone'] : 0 }
+	        {assign "android" ($item['downloads']['Android'] > 0) ? $item['downloads']['Android'] : 0 }
+	        {assign "download" $iphone + $android }
+	        <tr>
+	            <td>{$key|date_format}</td>
+	            <td>{$views}</td>
+	            <td>{$uses}</td>
+	            <td>{$launches}</td>
+	            <td>{$iphone}</td>
+	            <td>{$android}</td>
+	            <td>{$download}</td>
+	        </tr>
+	        {/foreach}
+	    </tbody>
+	</table>
+	<script type="text/javascript">
+		define(['hightables','highcharts'], function(){
+			yowza.parser = new Parser({
+				options : {
+					legend : {
+						align : 'center',
+						verticalAlign : 'top'
+					}
+				}
+			});
+		});
+	</script>
+</body>
+</html>
