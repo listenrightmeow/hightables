@@ -1,0 +1,4 @@
+hightables
+==========
+
+Highcharts JS Controller
