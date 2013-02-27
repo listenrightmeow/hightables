@@ -1,7 +1,13 @@
 var Hightable = Fidel.declare({
 	defaults : {
-		datetimeFormat : '%e of %b',
-		graphSteps : 12
+		datetimeFormat : {
+			hour: '%H:%M',
+			day : '%b %e',
+			month: '%b \'%y',
+			year: '%Y'
+		},
+		graphSteps : 12,
+		pointInterval : 24 * 3600 * 1000
 	},
 	elements : {
 		caption : 'caption',
@@ -101,7 +107,7 @@ var Hightable = Fidel.declare({
 		app.chart.push(new Highcharts.Chart(options));
 		this.setData(series);
 	},
-	visualizeLine : function(node,labels) {
+	visualizeLine : function(node,labels,increment) {
 		var options,
 			datetime = false,
 			labels = [],
@@ -109,7 +115,8 @@ var Hightable = Fidel.declare({
 			categories = {},
 			el = this.elements,
 			table = $('#' + node + '_table'),
-			graphSteps = (labels) ? labels : this.defaults.graphSteps;
+			graphSteps = (labels) ? labels : this.defaults.graphSteps,
+			increment = (increment) ? increment : 1;
 
 		$(el.th, table).each(function(){
 			var category = (table.hasClass('dataTable')) ? $(this).attr('aria-label').replace(/([\s|:].+)\s*/,'') : $(this).text().replace(/\s\W.\d.*/,'');
@@ -138,7 +145,7 @@ var Hightable = Fidel.declare({
 					name : prop,
 					data : categories[prop],
 					pointStart : categories.Date[0],
-					pointInterval : 24 * 3600 * 1000
+					pointInterval : this.defaults.pointInterval * increment
 				});
 			else
 				series.push({
@@ -158,8 +165,23 @@ var Hightable = Fidel.declare({
 			}
 		};
 		options.plotOptions.line = { marker : { enabled : false } };
-		options.xAxis = (datetime) ? { type : 'datetime', dateTimeLabelFormats : { day : this.defaults.datetimeFormat } } : { categories : labels, labels : { step : graphSteps } };
-        options.series = series;
+		options.xAxis = (datetime) ? {
+			type : 'datetime',
+			dateTimeLabelFormats : {
+				hour: this.defaults.datetimeFormat.hour,
+				day : this.defaults.datetimeFormat.day,
+				month: this.defaults.datetimeFormat.month,
+				year: this.defaults.datetimeFormat.year
+			}
+		}
+		:
+		{
+			categories : labels,
+			labels : {
+				step : graphSteps
+			}
+		};
+		options.series = series;
 
 		if(this.hasOwnProperty('options')) {
 			for (var prop in this.options) {
@@ -167,7 +189,7 @@ var Hightable = Fidel.declare({
 			}
 		}
 
-        app.chart.push(new Highcharts.Chart(options));
+		app.chart.push(new Highcharts.Chart(options));
 		this.setData(series);
 	},
 	visualizePie : function(node) {
